@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threads Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ===== Tokens ===== */
+    :root {
+      --white:   #ffffff;
+      --gray-50: #f9fafb;
+      --gray-100:#f3f4f6;
+      --gray-200:#e5e7eb;
+      --gray-300:#d1d5db;
+      --gray-400:#9ca3af;
+      --gray-500:#6b7280;
+      --gray-700:#374151;
+      --gray-900:#111827;
+      --black:   #0a0a0a;
+
+      --ink:     #111827;   /* primary text */
+      --ink2:    #6b7280;   /* secondary text */
+      --ink3:    #9ca3af;   /* placeholder / muted */
+
+      --surface:       #ffffff;
+      --surface-raised:#f9fafb;
+      --surface-inset: #f3f4f6;
+
+      --border:        #e5e7eb;
+      --border-strong: #d1d5db;
+
+      --accent:  #0a0a0a;       /* Threads black */
+      --accent-hover: #1f2937;
+      --accent-subtle: rgba(10,10,10,0.05);
+
+      --green:   #16a34a;
+      --green-bg:#f0fdf4;
+      --red:     #dc2626;
+      --red-bg:  #fef2f2;
+      --amber:   #d97706;
+      --amber-bg:#fffbeb;
+      --blue:    #2563eb;
+      --blue-bg: #eff6ff;
+
+      --sidebar-w: 224px;
+      --radius:    10px;
+      --radius-sm: 7px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    /* ===== Reset ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', 'Segoe UI', sans-serif;
+      background: var(--surface-raised);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    button { cursor: pointer; font-family: inherit; }
+    input, textarea, select { font-family: inherit; }
+    a { color: var(--accent); text-decoration: none; }
+
+    /* ===== Layout ===== */
+    .layout { display: flex; height: 100vh; overflow: hidden; }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .sidebar-logo {
+      padding: 20px 16px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+    .sidebar-logo .logo-mark {
+      width: 30px; height: 30px;
+      background: var(--black);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+    .sidebar-logo .logo-name  { font-size: 14px; font-weight: 700; color: var(--ink); line-height: 1.2; }
+    .sidebar-logo .logo-sub   { font-size: 11px; color: var(--ink3); }
+
+    .nav-group { padding: 8px 8px 0; }
+    .nav-group-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--ink3);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 8px 10px 4px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 9px;
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      color: var(--ink2);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+      border: none; background: none; text-align: left;
+    }
+    .nav-item:hover  { background: var(--surface-inset); color: var(--ink); }
+    .nav-item.active { background: var(--surface-inset); color: var(--ink); font-weight: 600; }
+    .nav-item.active .nav-dot { background: var(--accent); }
+    .nav-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gray-300);
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px;
+      color: var(--ink3);
+    }
+    .status-online {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    /* ===== Main ===== */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar {
+      height: 52px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+    .topbar-left { display: flex; align-items: baseline; gap: 8px; }
+    .topbar-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+    .topbar-actions { display: flex; align-items: center; gap: 8px; }
+
+    .content { flex: 1; overflow-y: auto; padding: 24px; background: var(--surface-raised); }
+
+    /* ===== Pages ===== */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ===== Section Header ===== */
+    .section-header { margin-bottom: 20px; }
+    .section-title { font-size: 18px; font-weight: 700; color: var(--ink); letter-spacing: -0.3px; }
+    .section-desc  { font-size: 13px; color: var(--ink2); margin-top: 2px; }
+
+    /* ===== Cards ===== */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .card-title { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .card-sub   { font-size: 12px; color: var(--ink3); margin-top: 1px; }
+
+    /* ===== Grid ===== */
+    .grid   { display: grid; gap: 16px; }
+    .cols-4 { grid-template-columns: repeat(4,1fr); }
+    .cols-3 { grid-template-columns: repeat(3,1fr); }
+    .cols-2 { grid-template-columns: repeat(2,1fr); }
+    .cols-6-4 { grid-template-columns: 6fr 4fr; }
+
+    /* ===== KPI Cards ===== */
+    .kpi {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .kpi-label { font-size: 12px; font-weight: 500; color: var(--ink2); margin-bottom: 6px; }
+    .kpi-value { font-size: 26px; font-weight: 800; color: var(--ink); letter-spacing: -1px; line-height: 1; }
+    .kpi-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .kpi-sub   { font-size: 11px; color: var(--ink3); }
+
+    /* ===== Badges ===== */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1px;
+    }
+    .badge-green  { background: var(--green-bg);  color: var(--green); }
+    .badge-red    { background: var(--red-bg);    color: var(--red); }
+    .badge-amber  { background: var(--amber-bg);  color: var(--amber); }
+    .badge-blue   { background: var(--blue-bg);   color: var(--blue); }
+    .badge-gray   { background: var(--surface-inset); color: var(--ink2); }
+    .badge-dark   { background: var(--ink); color: white; }
+
+    /* ===== Buttons ===== */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      transition: all 0.12s;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-primary  { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--white); color: var(--ink); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+    .btn-secondary:hover { background: var(--surface-inset); }
+    .btn-ghost    { background: none; color: var(--ink2); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--surface-inset); color: var(--ink); }
+    .btn-danger   { background: var(--red-bg); color: var(--red); border: 1px solid #fecaca; }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-sm  { padding: 5px 10px; font-size: 12px; }
+    .btn-xs  { padding: 3px 8px;  font-size: 11px; border-radius: 5px; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ===== Forms ===== */
+    .form-group  { margin-bottom: 14px; }
+    .form-label  { display: block; font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+    .form-hint   { font-size: 11px; color: var(--ink3); margin-top: 4px; }
+    .form-control {
+      width: 100%;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      padding: 8px 11px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.12s, box-shadow 0.12s;
+      box-shadow: var(--shadow-sm);
+    }
+    .form-control:focus { border-color: var(--gray-400); box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+    .form-control::placeholder { color: var(--ink3); }
+    textarea.form-control { resize: vertical; min-height: 90px; line-height: 1.5; }
+    select.form-control   { cursor: pointer; }
+
+    /* ===== Divider ===== */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+    /* ===== Tables ===== */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { border-bottom: 1px solid var(--border); }
+    th  { font-size: 11.5px; font-weight: 600; color: var(--ink2); padding: 10px 14px; text-align: left; white-space: nowrap; background: var(--surface-raised); }
+    td  { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--ink); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--gray-50); }
+
+    /* ===== Charts ===== */
+    .chart-box    { position: relative; height: 220px; }
+    .chart-box-lg { position: relative; height: 280px; }
+    .chart-box-xl { position: relative; height: 320px; }
+
+    /* ===== Loading ===== */
+    .loading {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 40px; gap: 10px; color: var(--ink3); font-size: 13px;
+    }
+    .spinner {
+      width: 22px; height: 22px;
+      border: 2px solid var(--border);
+      border-top-color: var(--ink);
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== Toast ===== */
+    #toastContainer { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--ink);
+      color: white;
+      border-radius: var(--radius-sm);
+      padding: 11px 16px;
+      font-size: 13px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      animation: slideUp 0.2s ease;
+      min-width: 240px;
+    }
+    .toast.success { background: #14532d; }
+    .toast.error   { background: #7f1d1d; }
+    .toast.info    { background: var(--ink); }
+    .toast.warning { background: #78350f; }
+    @keyframes slideUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* ===== Empty State ===== */
+    .empty { text-align: center; padding: 40px; color: var(--ink3); }
+    .empty-icon { font-size: 28px; margin-bottom: 10px; }
+    .empty-text { font-size: 13px; }
+
+    /* ===== Metric Row ===== */
+    .metric-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .metric-row:last-child { border-bottom: none; }
+    .metric-name { font-size: 13px; color: var(--ink2); }
+    .metric-val  { font-size: 14px; font-weight: 700; color: var(--ink); }
+
+    /* ===== Progress ===== */
+    .prog-bar  { background: var(--gray-100); border-radius: 3px; height: 5px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 3px; background: var(--ink); transition: width 0.5s ease; }
+
+    /* ===== Post Preview ===== */
+    .preview-box {
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.75;
+      min-height: 160px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--ink);
+    }
+    .preview-box.muted { color: var(--ink3); }
+
+    /* ===== Calendar ===== */
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 10px; }
+    .cal-day  { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-sm); }
+    .cal-head { background: var(--surface-raised); padding: 8px 10px; font-size: 11px; font-weight: 700; color: var(--ink2); border-bottom: 1px solid var(--border); text-align: center; letter-spacing: 0.3px; }
+    .cal-item { padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 11px; cursor: pointer; transition: background 0.1s; color: var(--ink); }
+    .cal-item:last-child { border-bottom: none; }
+    .cal-item:hover { background: var(--gray-50); }
+    .cal-item-cat  { font-size: 10px; font-weight: 600; color: var(--ink3); margin-bottom: 2px; }
+    .cal-item-time { font-size: 10px; color: var(--ink3); margin-top: 3px; }
+    .cal-empty { padding: 20px 10px; text-align: center; color: var(--ink3); font-size: 11px; }
+
+    /* ===== Tabs ===== */
+    .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; gap: 0; }
+    .tab { padding: 8px 14px; font-size: 13px; font-weight: 500; color: var(--ink2); cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.12s; }
+    .tab.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+    .tab:hover  { color: var(--ink); }
+
+    /* ===== Utility ===== */
+    .flex          { display: flex; }
+    .flex-between  { display: flex; justify-content: space-between; align-items: center; }
+    .flex-center   { display: flex; align-items: center; }
+    .gap-6  { gap: 6px; }
+    .gap-8  { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .gap-16 { gap: 16px; }
+    .mb-8   { margin-bottom: 8px; }
+    .mb-12  { margin-bottom: 12px; }
+    .mb-16  { margin-bottom: 16px; }
+    .mb-20  { margin-bottom: 20px; }
+    .mb-24  { margin-bottom: 24px; }
+    .mt-8   { margin-top: 8px; }
+    .mt-12  { margin-top: 12px; }
+    .w-full { width: 100%; }
+    .text-sm    { font-size: 12px; }
+    .text-xs    { font-size: 11px; }
+    .text-muted { color: var(--ink3); }
+    .text-green { color: var(--green); }
+    .text-red   { color: var(--red); }
+    .fw-600     { font-weight: 600; }
+    .fw-700     { font-weight: 700; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1200px) { .cols-4 { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 960px)  { .cols-6-4 { grid-template-columns: 1fr; } .cols-3 { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px)  { .sidebar { display: none; } .cols-2, .cols-4 { grid-template-columns: 1fr; } }
+
+    /* ===== Secretary Chat ===== */
+    .secretary-wrap {
+      display: flex; flex-direction: column;
+      height: calc(100vh - 52px - 48px);
+      max-width: 760px; margin: 0 auto;
+    }
+    .chat-messages {
+      flex: 1; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 16px;
+      padding: 8px 0 16px;
+    }
+    .chat-msg { display: flex; gap: 10px; align-items: flex-start; }
+    .chat-msg.user { flex-direction: row-reverse; }
+    .chat-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--surface-inset); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .chat-msg.user .chat-avatar { background: var(--accent); color: #fff; }
+    .chat-bubble {
+      max-width: 75%; padding: 12px 16px;
+      border-radius: 16px; font-size: 14px; line-height: 1.65;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--ink); white-space: pre-wrap; word-break: break-word;
+    }
+    .chat-msg.user .chat-bubble {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+    }
+    .chat-bubble.streaming::after {
+      content: '▌'; animation: blink .7s infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .chat-input-area {
+      display: flex; gap: 8px; padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .chat-input {
+      flex: 1; padding: 12px 14px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      font-size: 14px; font-family: inherit; resize: none;
+      background: var(--surface); color: var(--ink);
+      outline: none; line-height: 1.5; min-height: 44px; max-height: 120px;
+    }
+    .chat-input:focus { border-color: var(--accent); }
+    .chat-suggestions {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+    }
+    .chat-suggestion {
+      padding: 6px 12px; border: 1px solid var(--border);
+      border-radius: 20px; font-size: 12px; cursor: pointer;
+      background: var(--surface); color: var(--ink2);
+      transition: all .15s;
+    }
+    .chat-suggestion:hover { border-color: var(--accent); color: var(--ink); }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">T</div>
+      <div>
+        <div class="logo-name">Threads</div>
+        <div class="logo-sub">SNS Manager</div>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">概要</div>
+      <button class="nav-item active" onclick="navigate('dashboard')">
+        <span class="nav-dot"></span> ダッシュボード
+      </button>
+      <button class="nav-item" onclick="navigate('insights')">
+        <span class="nav-dot"></span> インサイト分析
+      </button>
+      <button class="nav-item" onclick="navigate('followers')">
+        <span class="nav-dot"></span> フォロワー推移
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">コンテンツ</div>
+      <button class="nav-item" onclick="navigate('creator')">
+        <span class="nav-dot"></span> 投稿作成
+      </button>
+      <button class="nav-item" onclick="navigate('calendar')">
+        <span class="nav-dot"></span> コンテンツ計画
+      </button>
+      <button class="nav-item" onclick="navigate('schedule')">
+        <span class="nav-dot"></span> 予約投稿
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">分析</div>
+      <button class="nav-item" onclick="navigate('posts')">
+        <span class="nav-dot"></span> 投稿一覧
+      </button>
+      <button class="nav-item" onclick="navigate('timing')">
+        <span class="nav-dot"></span> 時間帯分析
+      </button>
+      <button class="nav-item" onclick="navigate('velocity')">
+        <span class="nav-dot"></span> 速度追跡
+      </button>
+      <button class="nav-item" onclick="navigate('reports')">
+        <span class="nav-dot"></span> レポート
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">AI</div>
+      <button class="nav-item" onclick="navigate('secretary')">
+        <span class="nav-dot"></span> 秘書
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">リサーチ</div>
+      <button class="nav-item" onclick="navigate('trend')">
+        <span class="nav-dot"></span> バズパターン分析
+      </button>
+      <button class="nav-item" onclick="navigate('competitor')">
+        <span class="nav-dot"></span> 競合比較
+      </button>
+      <button class="nav-item" onclick="navigate('replies')">
+        <span class="nav-dot"></span> 返信分析
+      </button>
+      <button class="nav-item" onclick="navigate('news')">
+        <span class="nav-dot"></span> ニュース投稿
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="status-pill">
+        <span class="status-online"></span>
+        <span>稼働中</span>
+      </div>
+      <div class="text-xs text-muted mt-8" id="lastUpdated">-</div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-title" id="pageTitle">ダッシュボード</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost btn-sm" id="refreshBtn" onclick="refreshData()">更新</button>
+        <button class="btn btn-primary btn-sm" onclick="runDailyCycle()">日次実行</button>
+        <div id="userBadge" style="display:flex;align-items:center;gap:8px;margin-left:8px;padding:0 12px;height:32px;background:var(--surface-inset);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);">
+          <span>👤</span>
+          <span id="userBadgeName">—</span>
+          <a href="/auth/logout" style="color:var(--ink3);font-size:11px;text-decoration:none;margin-left:4px;" title="ログアウト">ログアウト</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ========== DASHBOARD ========== -->
+      <div class="page active" id="page-dashboard">
+
+        <!-- Primary KPIs -->
+        <div class="grid cols-4 mb-16">
+          <div class="kpi">
+            <div class="kpi-label">フォロワー</div>
+            <div class="kpi-value" id="kpi-followers">—</div>
+            <div class="kpi-footer">
+              <span class="kpi-sub" id="kpi-followers-sub">読み込み中</span>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">エンゲージメント率</div>
+            <div class="kpi-value" id="kpi-engagement">—</div>
+            <div class="kpi-footer">
+              <span class="kpi-sub">目標 3.0%</span>
+              <span class="badge" id="kpi-engagement-badge">—</span>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">総閲覧数</div>
+            <div class="kpi-value" id="kpi-views">—</div>
+            <div class="kpi-footer">
+              <span class="kpi-sub" id="kpi-views-sub">—</span>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">総投稿数</div>
+            <div class="kpi-value" id="kpi-posts">—</div>
+            <div class="kpi-footer">
+              <span class="kpi-sub">分析対象</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary KPIs -->
+        <div class="grid cols-4 mb-24">
+          <div class="kpi">
+            <div class="kpi-label">総いいね</div>
+            <div class="kpi-value" id="kpi-likes">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">総返信</div>
+            <div class="kpi-value" id="kpi-replies">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">総リポスト</div>
+            <div class="kpi-value" id="kpi-reposts">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">平均閲覧数</div>
+            <div class="kpi-value" id="kpi-avg-views">—</div>
+          </div>
+        </div>
+
+        <!-- Charts + Trends -->
+        <div class="grid cols-6-4 mb-16">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">閲覧数 / エンゲージメント（上位30投稿）</div>
+                <div class="card-sub">閲覧数順に並べた投稿パフォーマンス</div>
+              </div>
+            </div>
+            <div class="chart-box-lg">
+              <canvas id="engagementChart"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">頻出キーワード</div>
+            </div>
+            <div id="trendTopics">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top posts + Recommendations -->
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">パフォーマンス上位投稿</div>
+              <button class="btn btn-ghost btn-xs" onclick="navigate('posts')">すべて見る</button>
+            </div>
+            <div id="topPosts">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">改善提案</div>
+            </div>
+            <div id="recommendations">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== INSIGHTS ========== -->
+      <div class="page" id="page-insights">
+        <div class="section-header">
+          <div class="section-title">インサイト分析</div>
+          <div class="section-desc">最新のアカウントパフォーマンスデータ</div>
+        </div>
+
+        <!-- 拡散・反応率 KPI -->
+        <div class="grid cols-3 mb-16">
+          <div class="kpi">
+            <div class="kpi-label">リーチ率</div>
+            <div class="kpi-value" id="ins-reach-rate">—</div>
+            <div class="kpi-footer">
+              <span class="kpi-sub">平均閲覧 ÷ フォロワー数</span>
+              <span class="badge" id="ins-reach-badge"></span>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">リポスト率（拡散力）</div>
+            <div class="kpi-value" id="ins-repost-rate">—</div>
+            <div class="kpi-footer">
+              <span class="kpi-sub">（リポスト＋引用） ÷ 総閲覧数</span>
+              <span class="badge" id="ins-repost-badge"></span>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">返信率（共感力）</div>
+            <div class="kpi-value" id="ins-reply-rate">—</div>
+            <div class="kpi-footer">
+              <span class="kpi-sub">総返信 ÷ 総閲覧数</span>
+              <span class="badge" id="ins-reply-badge"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- アカウント指標 + エンゲージメント内訳 -->
+        <div class="grid cols-2 mb-16">
+          <div class="card">
+            <div class="card-header"><div class="card-title">アカウント指標</div></div>
+            <div id="insightsMetrics">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">エンゲージメント内訳</div>
+            </div>
+            <div class="chart-box" style="height:180px;">
+              <canvas id="engBreakdownChart"></canvas>
+            </div>
+            <div id="engBreakdownStats" style="margin-top:12px;"></div>
+          </div>
+        </div>
+
+        <!-- カテゴリ別パフォーマンス + 閲覧数上位 -->
+        <div class="grid cols-2 mb-16">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">投稿タイプ別パフォーマンス</div>
+                <div class="card-sub">テキスト・画像・動画別の平均指標</div>
+              </div>
+            </div>
+            <div id="categoryPerformance">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">エンゲージメント率 分布</div>
+              <div class="card-sub">全投稿のER分布</div>
+            </div>
+            <div class="chart-box">
+              <canvas id="erDistributionChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- 閲覧数上位20 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">閲覧数 上位20投稿</div>
+          </div>
+          <div class="chart-box-xl">
+            <canvas id="topViewsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== FOLLOWERS ========== -->
+      <div class="page" id="page-followers">
+        <div class="section-header">
+          <div class="section-title">フォロワー推移</div>
+          <div class="section-desc">毎日06:00に自動記録されます</div>
+        </div>
+
+        <div class="grid cols-3 mb-16">
+          <div class="kpi">
+            <div class="kpi-label">現在のフォロワー</div>
+            <div class="kpi-value" id="fol-current">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">最大値（記録中）</div>
+            <div class="kpi-value" id="fol-max">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">記録日数</div>
+            <div class="kpi-value" id="fol-days">—</div>
+          </div>
+        </div>
+
+        <div class="card mb-16">
+          <div class="card-header">
+            <div class="card-title">フォロワー数推移</div>
+          </div>
+          <div class="chart-box-xl">
+            <canvas id="followersChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">記録一覧</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>日付</th><th>フォロワー数</th><th>前日比</th></tr></thead>
+              <tbody id="followersTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== CREATOR ========== -->
+      <div class="page" id="page-creator">
+        <div class="section-header">
+          <div class="section-title">投稿作成</div>
+          <div class="section-desc">トピックを設定して投稿を生成・編集できます</div>
+        </div>
+
+        <div class="grid cols-2">
+          <!-- Left: Settings -->
+          <div>
+            <div class="card mb-16">
+              <div class="card-header"><div class="card-title">投稿設定</div></div>
+
+              <div class="form-group">
+                <label class="form-label">カテゴリ</label>
+                <select class="form-control" id="postCategory">
+                  <option value="tips">ノウハウ・Tips</option>
+                  <option value="question">質問・議論促進</option>
+                  <option value="story">ストーリー・体験談</option>
+                  <option value="trend">トレンド・時事</option>
+                  <option value="behind">Behind the scenes</option>
+                  <option value="promotion">プロモーション</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">トピック <span style="color:var(--red)">*</span></label>
+                <input class="form-control" id="postTopic" placeholder="例: 朝のルーティンを変えたら仕事の質が上がった話" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">キーワード</label>
+                <input class="form-control" id="postKeywords" placeholder="例: 習慣, 生産性（カンマ区切り）" />
+                <div class="form-hint">投稿に含めたいワードをカンマ区切りで入力</div>
+              </div>
+
+              <button class="btn btn-primary w-full" onclick="generatePost()" id="generateBtn">
+                投稿を生成する
+              </button>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="card-title">テンプレートから始める</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                <button class="btn btn-ghost btn-sm w-full" onclick="useTemplate('tips')" style="justify-content:flex-start;font-weight:500;">ノウハウ系</button>
+                <button class="btn btn-ghost btn-sm w-full" onclick="useTemplate('question')" style="justify-content:flex-start;font-weight:500;">質問系</button>
+                <button class="btn btn-ghost btn-sm w-full" onclick="useTemplate('story')" style="justify-content:flex-start;font-weight:500;">体験談</button>
+                <button class="btn btn-ghost btn-sm w-full" onclick="useTemplate('list')" style="justify-content:flex-start;font-weight:500;">リスト系</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Preview + Schedule -->
+          <div>
+            <div class="card mb-16">
+              <div class="card-header">
+                <div class="card-title">投稿内容</div>
+                <div class="flex gap-6">
+                  <button class="btn btn-ghost btn-xs" onclick="clearPost()">クリア</button>
+                  <button class="btn btn-ghost btn-xs" onclick="copyPost()">コピー</button>
+                </div>
+              </div>
+              <textarea
+                class="form-control"
+                id="postPreview"
+                rows="10"
+                placeholder="ここに直接入力するか、左のAI生成ボタンを使って投稿文を作成してください"
+                oninput="onPreviewInput()"
+                style="resize:vertical;min-height:180px;line-height:1.75;font-size:14px;"
+              ></textarea>
+              <div class="flex-between mt-8">
+                <span class="text-xs text-muted" id="charCount">0 / 500文字</span>
+                <span class="text-xs text-muted" id="postStatus"></span>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="card-title">予約設定</div></div>
+              <div class="form-group">
+                <label class="form-label">投稿日時</label>
+                <input class="form-control" type="datetime-local" id="scheduleDateTime" />
+              </div>
+              <button class="btn btn-secondary w-full" onclick="scheduleCurrentPost()" id="scheduleBtn" disabled>
+                この投稿を予約する
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== CALENDAR ========== -->
+      <div class="page" id="page-calendar">
+        <div class="flex-between mb-20">
+          <div>
+            <div class="section-title">投稿管理カレンダー</div>
+            <div class="section-desc">予約済み投稿とコンテンツ計画の一覧</div>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-ghost btn-sm" onclick="loadCalendarPage()">更新</button>
+            <button class="btn btn-primary btn-sm" onclick="navigate('creator')">新しい投稿を作成</button>
+          </div>
+        </div>
+
+        <!-- 予約済み投稿タイムライン -->
+        <div class="card mb-16">
+          <div class="card-header">
+            <div>
+              <div class="card-title">予約済み投稿</div>
+              <div class="card-sub">実際にスケジュールされている投稿</div>
+            </div>
+
+            <span class="badge badge-blue" id="scheduledCount">0件</span>
+          </div>
+          <div id="scheduledTimeline">
+            <div class="empty"><div class="empty-icon">📭</div><div class="empty-text">予約済みの投稿はありません</div></div>
+          </div>
+        </div>
+
+        <!-- コンテンツ計画 -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title" id="calWeekLabel">コンテンツ計画</div>
+              <div class="card-sub">AIが提案する今週の投稿アイデア</div>
+            </div>
+            <button class="btn btn-ghost btn-xs" onclick="generatePlan()">再生成</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>日時</th><th>曜日</th><th>カテゴリ</th><th>トピック</th><th>想定ER</th><th></th></tr></thead>
+              <tbody id="calendarTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== SCHEDULE ========== -->
+      <div class="page" id="page-schedule">
+        <div class="flex-between mb-20">
+          <div>
+            <div class="section-title">予約投稿</div>
+            <div class="section-desc">投稿の実行状況をリアルタイムで確認できます</div>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-ghost btn-sm" onclick="loadSchedule()">更新</button>
+            <button class="btn btn-primary btn-sm" onclick="navigate('creator')">新しい投稿を作成</button>
+          </div>
+        </div>
+
+        <div class="grid cols-4 mb-16">
+          <div class="kpi">
+            <div class="kpi-label">予約済み</div>
+            <div class="kpi-value" id="sch-scheduled">—</div>
+            <div class="kpi-footer"><span class="kpi-sub">実行待ち</span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">投稿済み</div>
+            <div class="kpi-value" id="sch-published">—</div>
+            <div class="kpi-footer"><span class="kpi-sub" style="color:var(--green)">実行完了</span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">失敗</div>
+            <div class="kpi-value" id="sch-failed">—</div>
+            <div class="kpi-footer"><span class="kpi-sub" style="color:var(--red)">要確認</span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">自動更新</div>
+            <div class="kpi-value" style="font-size:14px;padding-top:4px;" id="sch-autoreload">待機中</div>
+            <div class="kpi-footer"><span class="kpi-sub">30秒ごと</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">実行状況一覧</div>
+            <span class="text-xs text-muted" id="sch-last-updated"></span>
+          </div>
+          <div id="scheduleCards">
+            <div class="loading"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== POSTS ========== -->
+      <div class="page" id="page-posts">
+        <div class="flex-between mb-20">
+          <div>
+            <div class="section-title">投稿一覧</div>
+            <div class="section-desc">すべての投稿とパフォーマンス</div>
+          </div>
+          <select class="form-control" id="postSortBy" onchange="sortPosts()" style="width:130px;">
+            <option value="views">閲覧数順</option>
+            <option value="likes">いいね順</option>
+            <option value="er">ER順</option>
+            <option value="date">日付順</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>投稿日時</th>
+                  <th>本文</th>
+                  <th style="text-align:right;">閲覧</th>
+                  <th style="text-align:right;">いいね</th>
+                  <th style="text-align:right;">返信</th>
+                  <th style="text-align:right;">リポスト</th>
+                  <th style="text-align:right;">ER</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="postsTable">
+                <tr><td colspan="8"><div class="loading"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== TIMING ANALYSIS ========== -->
+      <div class="page" id="page-timing">
+        <div class="section-header">
+          <div class="section-title">時間帯分析</div>
+          <div class="section-desc">投稿パフォーマンスの時間帯・曜日傾向と最適投稿時間の推奨</div>
+        </div>
+
+        <!-- 最適時間推奨バナー -->
+        <div class="card mb-16" id="bestTimeCard">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+
+        <!-- 時間帯 + 曜日チャート -->
+        <div class="grid cols-2 mb-16">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">時間帯別 平均閲覧数</div>
+                <div class="card-sub">投稿実績のある時間帯のみ表示</div>
+              </div>
+            </div>
+            <div class="chart-box-lg">
+              <canvas id="hourlyChart"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">曜日別 パフォーマンス</div>
+                <div class="card-sub">平均閲覧数とエンゲージメント率</div>
+              </div>
+            </div>
+            <div class="chart-box-lg">
+              <canvas id="weeklyChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- バイラル投稿 + コンテンツ長分析 -->
+        <div class="grid cols-2 mb-16">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">バイラル投稿分析（10万views超）</div>
+            </div>
+            <div id="viralPostsPanel">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">テキスト長別パフォーマンス</div>
+            </div>
+            <div class="chart-box">
+              <canvas id="lengthChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- 拡散力・返信率 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">拡散力・会話誘発力ランキング（上位10投稿）</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>投稿本文</th>
+                  <th style="text-align:right;">閲覧数</th>
+                  <th style="text-align:right;">拡散率</th>
+                  <th style="text-align:right;">返信率</th>
+                </tr>
+              </thead>
+              <tbody id="viralityTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== VELOCITY TRACKING ========== -->
+      <div class="page" id="page-velocity">
+        <div class="section-header">
+          <div class="section-title">速度追跡</div>
+          <div class="section-desc">投稿後の閲覧数増加速度・初速・半減期・マイルストーン到達時間</div>
+        </div>
+
+        <!-- サマリーKPI -->
+        <div class="grid cols-3 mb-16" id="velocityKpis">
+          <div class="kpi">
+            <div class="kpi-label">追跡中投稿数</div>
+            <div class="kpi-value" id="vel-tracking">—</div>
+            <div class="kpi-footer"><span class="kpi-sub">7日間自動追跡</span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">平均初速（1時間）</div>
+            <div class="kpi-value" id="vel-first-hour">—</div>
+            <div class="kpi-footer"><span class="kpi-sub">views / 投稿後1h</span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">平均半減期</div>
+            <div class="kpi-value" id="vel-halflife">—</div>
+            <div class="kpi-footer"><span class="kpi-sub">ピーク後の失速時間</span></div>
+          </div>
+        </div>
+
+        <div class="card mb-16">
+          <div class="card-header">
+            <div class="card-title">投稿別 速度データ</div>
+            <button class="btn btn-ghost btn-xs" onclick="loadVelocityPage()">更新</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>投稿日時</th>
+                  <th>本文</th>
+                  <th style="text-align:right;">初速 (1h)</th>
+                  <th style="text-align:right;">ピーク</th>
+                  <th style="text-align:right;">半減期</th>
+                  <th style="text-align:right;">24h views</th>
+                  <th style="text-align:right;">累計</th>
+                  <th>状態</th>
+                </tr>
+              </thead>
+              <tbody id="velocityTable">
+                <tr><td colspan="8"><div class="loading"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">マイルストーン到達時間</div>
+            <div class="card-sub">各viewsマイルストーンに何時間後に到達したか</div>
+          </div>
+          <div id="milestonesPanel">
+            <div class="loading"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== REPORTS ========== -->
+      <!-- ========== SECRETARY ========== -->
+      <div class="page" id="page-secretary">
+        <div class="secretary-wrap">
+          <div class="chat-suggestions" id="secretarySuggestions">
+            <button class="chat-suggestion" onclick="secretarySuggest('今日のThreadsの状況をまとめて')">今日の状況まとめ</button>
+            <button class="chat-suggestion" onclick="secretarySuggest('次に投稿すべき内容を提案して')">投稿アイデア</button>
+            <button class="chat-suggestion" onclick="secretarySuggest('新規クライアント向けの提案書の概要を作って')">提案書の概要</button>
+            <button class="chat-suggestion" onclick="secretarySuggest('今月の成果をクライアントに報告するコメント文を作って')">月次レポートコメント</button>
+            <button class="chat-suggestion" onclick="secretarySuggest('エンゲージメントを上げるための改善提案をして')">改善提案</button>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg">
+              <div class="chat-avatar">秘</div>
+              <div class="chat-bubble">こんにちは。Threads運用のサポートをします。投稿の分析、提案書の作成、クライアントへのコメント文など、何でも聞いてください。</div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <textarea id="chatInput" class="chat-input" placeholder="メッセージを入力... (Shift+Enterで改行)" rows="1"
+              onkeydown="chatKeydown(event)" oninput="chatAutoResize(this)"></textarea>
+            <button class="btn btn-primary" onclick="sendSecretaryMessage()" id="chatSendBtn">送信</button>
+            <button class="btn btn-ghost btn-sm" onclick="clearSecretaryChat()" title="会話をリセット">↺</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-reports">
+        <div class="section-header">
+          <div class="section-title">レポート</div>
+          <div class="section-desc">クライアント向けレポートの生成</div>
+        </div>
+
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">レポート生成</div></div>
+
+            <div class="form-group">
+              <label class="form-label">レポートタイプ</label>
+              <select class="form-control" id="reportType" onchange="onReportTypeChange()">
+                <option value="monthly">今月のクライアントレポート</option>
+                <option value="custom">カスタム期間レポート</option>
+                <option value="weekly">週次サマリー</option>
+              </select>
+            </div>
+
+            <div id="customDateFields" style="display:none;">
+              <div class="form-group">
+                <label class="form-label">開始日</label>
+                <input class="form-control" type="date" id="reportStart" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">終了日</label>
+                <input class="form-control" type="date" id="reportEnd" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">クライアント名（任意）</label>
+              <input class="form-control" id="reportClient" placeholder="例: kzktone" />
+            </div>
+
+            <button class="btn btn-primary w-full" onclick="generateReport()">
+              レポートを生成
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">生成済みレポート</div></div>
+            <div id="reportsList">
+              <div class="empty">
+                <div class="empty-icon">📄</div>
+                <div class="empty-text text-muted">レポートを生成するとここに表示されます</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== TREND ========== -->
+      <div class="page" id="page-trend">
+        <div class="flex-between mb-20">
+          <div>
+            <div class="section-title">バズパターン分析</div>
+            <div class="section-desc">過去投稿から「伸びる投稿の法則」をAIが分析</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="loadTrendPage(true)">再分析</button>
+        </div>
+
+        <div id="trendLoading" class="card" style="text-align:center;padding:40px;">
+          <div class="spinner" style="margin:0 auto 12px;"></div>
+          <div class="text-muted">分析中...</div>
+        </div>
+
+        <div id="trendContent" style="display:none;">
+          <!-- サマリー -->
+          <div class="card mb-16">
+            <div class="card-header"><div class="card-title">分析サマリー</div></div>
+            <p id="trendSummary" style="font-size:14px;line-height:1.8;color:var(--ink2);"></p>
+          </div>
+
+          <!-- バズパターン -->
+          <div class="card mb-16">
+            <div class="card-header"><div class="card-title">バズ投稿のパターン</div></div>
+            <div id="trendPatterns"></div>
+          </div>
+
+          <!-- 数値指標 -->
+          <div class="grid cols-3 mb-16">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">最適な文字数</div>
+              <div id="trendOptimalLength" style="font-size:13px;color:var(--ink2);"></div>
+            </div>
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">最適な投稿時間</div>
+              <div id="trendOptimalTiming" style="font-size:13px;color:var(--ink2);"></div>
+            </div>
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">ハッシュタグ戦略</div>
+              <div id="trendHashtag" style="font-size:13px;color:var(--ink2);"></div>
+            </div>
+          </div>
+
+          <!-- すぐ使えるTips -->
+          <div class="card mb-16">
+            <div class="card-header"><div class="card-title">すぐ使えるTips</div></div>
+            <ul id="trendTips" style="padding-left:20px;line-height:2;font-size:13px;color:var(--ink2);"></ul>
+          </div>
+
+          <!-- 時間帯別・文字数別 グラフ -->
+          <div class="grid cols-2 mb-16">
+            <div class="card">
+              <div class="card-header"><div class="card-title">時間帯別 平均ER</div></div>
+              <div class="chart-box"><canvas id="trendHourChart"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">文字数・ハッシュタグ別 平均ER</div></div>
+              <div class="chart-box"><canvas id="trendLengthChart"></canvas></div>
+            </div>
+          </div>
+
+          <!-- 上位投稿リスト -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">エンゲージメント上位投稿</div></div>
+            <div id="trendTopPostsList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== COMPETITOR ========== -->
+      <div class="page" id="page-competitor">
+        <div class="flex-between mb-20">
+          <div>
+            <div class="section-title">競合比較</div>
+            <div class="section-desc">競合アカウントと自分のKPIを比較</div>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-ghost btn-sm" onclick="loadCompetitorPage()">更新</button>
+            <button class="btn btn-primary btn-sm" onclick="showAddCompetitorModal()">競合を追加</button>
+          </div>
+        </div>
+
+        <!-- 競合追加モーダル -->
+        <div id="addCompetitorModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;display:flex;align-items:center;justify-content:center;">
+          <div class="card" style="width:360px;position:relative;">
+            <div class="card-header"><div class="card-title">競合アカウントを追加</div></div>
+            <div class="form-group">
+              <label class="form-label">Threadsユーザー名</label>
+              <input class="form-control" id="competitorUsername" placeholder="例: username（@不要）" />
+            </div>
+            <div class="flex gap-8">
+              <button class="btn btn-primary w-full" onclick="addCompetitor()">追加</button>
+              <button class="btn btn-ghost w-full" onclick="hideAddCompetitorModal()">キャンセル</button>
+            </div>
+          </div>
+        </div>
+        <div id="addCompetitorModal" style="display:none;"></div>
+
+        <!-- AI推薦セクション -->
+        <div class="card mb-16" id="recommendCard">
+          <div class="card-header">
+            <div>
+              <div class="card-title">AIが推薦するベンチマーク候補</div>
+              <div class="card-sub">自分の投稿を分析してClaudeが提案</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="loadRecommendedCompetitors(true)" id="recommendBtn">AIに聞く</button>
+          </div>
+          <div id="recommendContent">
+            <div class="empty"><div class="empty-text text-muted">「AIに聞く」ボタンで分析を開始します</div></div>
+          </div>
+        </div>
+
+        <!-- 競合リスト -->
+        <div class="card mb-16">
+          <div class="card-header">
+            <div class="card-title">登録済み競合</div>
+            <button class="btn btn-ghost btn-sm" onclick="updateAllCompetitors()">全件更新</button>
+          </div>
+          <div id="competitorList">
+            <div class="empty"><div class="empty-icon">👤</div><div class="empty-text">競合アカウントを追加してください</div></div>
+          </div>
+        </div>
+
+        <!-- ベンチマーク比較 -->
+        <div class="card mb-16">
+          <div class="card-header"><div class="card-title">KPIベンチマーク比較</div></div>
+          <div id="benchmarkContent">
+            <div class="empty"><div class="empty-text text-muted">競合データ取得後に表示されます</div></div>
+          </div>
+        </div>
+
+        <!-- 競合取得済み投稿一覧 -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">取得済み投稿一覧</div><div class="card-sub">いいね数の多い順</div></div>
+          <div id="competitorTopPosts">
+            <div class="empty"><div class="empty-text text-muted">競合データ取得後に表示されます</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== REPLIES ========== -->
+      <div class="page" id="page-replies">
+        <div class="section-header mb-20">
+          <div class="section-title">返信分析</div>
+          <div class="section-desc">投稿への返信を分類・分析し、最適な返信テンプレートを生成</div>
+        </div>
+
+        <!-- 投稿選択 -->
+        <div class="card mb-16">
+          <div class="card-header"><div class="card-title">分析する投稿を選択</div></div>
+          <div class="flex gap-8">
+            <select class="form-control" id="replyPostSelect" style="flex:1;" onchange="onReplyPostSelect()">
+              <option value="">投稿を選択...</option>
+            </select>
+            <button class="btn btn-primary" onclick="analyzeReplies()">AI分析</button>
+          </div>
+          <div id="replyPostPreview" style="margin-top:12px;font-size:13px;color:var(--ink2);display:none;padding:12px;background:var(--surface-raised);border-radius:var(--radius-sm);"></div>
+        </div>
+
+        <!-- 返信サマリー -->
+        <div id="repliesResult" style="display:none;">
+          <div class="grid cols-5 mb-16" id="repliesSummaryGrid"></div>
+
+          <!-- 分類別タブ -->
+          <div class="card mb-16">
+            <div class="card-header">
+              <div class="card-title">返信分類</div>
+              <div class="flex gap-4" id="replyTabs">
+                <button class="btn btn-ghost btn-xs active" onclick="showReplyTab('positive')">ポジティブ</button>
+                <button class="btn btn-ghost btn-xs" onclick="showReplyTab('question')">質問</button>
+                <button class="btn btn-ghost btn-xs" onclick="showReplyTab('impression')">感想</button>
+                <button class="btn btn-ghost btn-xs" onclick="showReplyTab('negative')">ネガティブ</button>
+                <button class="btn btn-ghost btn-xs" onclick="showReplyTab('other')">その他</button>
+              </div>
+            </div>
+            <div id="replyTabContent"></div>
+          </div>
+
+          <!-- よくある質問 -->
+          <div class="card mb-16">
+            <div class="card-header"><div class="card-title">よくある質問（FAQ）</div></div>
+            <div id="replyFAQs"></div>
+          </div>
+
+          <!-- 返信テンプレート -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">返信テンプレート</div></div>
+            <div id="replyTemplates"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== NEWS ========== -->
+      <div class="page" id="page-news">
+        <div class="section-header mb-20">
+          <div class="section-title">ニュース自動投稿</div>
+          <div class="section-desc">Google News からAIニュースを取得し、Threads用投稿に変換・予約投稿</div>
+        </div>
+
+        <!-- コントロール -->
+        <div class="card mb-16">
+          <div class="card-header">
+            <div class="card-title">ニュース取得 &amp; 自動生成</div>
+          </div>
+          <div class="flex gap-8 flex-wrap">
+            <button class="btn btn-primary" onclick="fetchNewsArticles()">ニュースを取得</button>
+            <button class="btn btn-ghost" onclick="generateNewsPostsFromSelected()">選択記事から投稿生成</button>
+            <button class="btn btn-ghost" onclick="newsAutoRun()">自動実行（取得→生成→予約）</button>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--ink3);">
+            ※ 毎朝8:10 JST に自動取得・生成・予約投稿が実行されます
+          </div>
+        </div>
+
+        <!-- 記事リスト -->
+        <div class="card mb-16" id="newsArticlesCard" style="display:none;">
+          <div class="card-header">
+            <div class="card-title">新着記事 <span id="newsArticleCount" style="font-size:12px;color:var(--ink3);font-weight:400;"></span></div>
+            <div class="flex gap-4">
+              <button class="btn btn-ghost btn-xs" onclick="newsSelectAll()">全選択</button>
+              <button class="btn btn-ghost btn-xs" onclick="newsDeselectAll()">選択解除</button>
+            </div>
+          </div>
+          <div id="newsArticleList"></div>
+        </div>
+
+        <!-- 生成された投稿プレビュー -->
+        <div class="card mb-16" id="newsGeneratedCard" style="display:none;">
+          <div class="card-header">
+            <div class="card-title">生成された投稿</div>
+          </div>
+          <div id="newsGeneratedList"></div>
+          <div style="margin-top:16px;">
+            <div class="flex gap-8 align-center flex-wrap">
+              <label style="font-size:13px;color:var(--ink2);">最初の投稿日時:</label>
+              <input type="datetime-local" class="form-control" id="newsScheduleDateTime" style="width:220px;">
+              <span style="font-size:12px;color:var(--ink3);">（以降30分間隔で自動設定）</span>
+            </div>
+            <button class="btn btn-primary" style="margin-top:12px;" onclick="scheduleNewsPosts()">予約投稿に登録</button>
+          </div>
+        </div>
+
+        <!-- スケジュール済みニュース投稿 -->
+        <div class="card" id="newsScheduledCard">
+          <div class="card-header">
+            <div class="card-title">スケジュール済みニュース投稿</div>
+            <button class="btn btn-ghost btn-xs" onclick="loadNewsScheduled()">更新</button>
+          </div>
+          <div id="newsScheduledList"><div style="color:var(--ink3);font-size:13px;">読み込み中...</div></div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<div id="toastContainer"></div>
+
+<script src="/js/dashboard.js"></script>
+<script>
+  function onReportTypeChange() {
+    const v = document.getElementById('reportType').value;
+    document.getElementById('customDateFields').style.display = v === 'custom' ? 'block' : 'none';
+  }
+
+  // Default schedule time: +1 hour
+  const _now = new Date();
+  _now.setHours(_now.getHours() + 1, 0, 0, 0);
+  document.getElementById('scheduleDateTime').value = _now.toISOString().slice(0, 16);
+
+  initAuth().then(ok => { if (ok) loadDashboard(); });
+</script>
+</body>
+</html>

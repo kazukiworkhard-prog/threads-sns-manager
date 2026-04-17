@@ -1,0 +1,26 @@
+# 環境変数・シークレット
+.env
+config/google_service_account.json
+config/threads.json
+
+# ユーザーデータ・認証情報
+data/
+reports/
+
+# 依存関係
+node_modules/
+
+# Claude Code設定
+.claude/
+
+# 画像ファイル（大容量）
+*.jpg
+*.jpeg
+*.png
+*.gif
+
+# ログ・一時ファイル
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db

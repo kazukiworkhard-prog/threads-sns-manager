@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>島村一輝 | Threads SNS運用サポート</title>
+  <meta name="description" content="Threads SNSの分析・投稿設計・自動化まで。670本の投稿データと独自システムで、あなたのThreads運用を加速します。">
+  <meta property="og:title" content="島村一輝 | Threads SNS運用サポート">
+  <meta property="og:description" content="累計1,413万回閲覧・19件のバズ投稿実績。データドリブンなThreads運用を完全サポート。">
+  <meta property="og:type" content="website">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==================  Nav (light)  ================== -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">kzktone</a>
+      <ul class="nav-links">
+        <li><a href="#services">サービス</a></li>
+        <li><a href="#achievements">実績</a></li>
+        <li><a href="#flow">支援の流れ</a></li>
+        <li><a href="#profile">プロフィール</a></li>
+        <li><a href="#contact" class="nav-contact">お問い合わせ</a></li>
+      </ul>
+      <button class="nav-hamburger" id="hamburger" aria-label="メニューを開く">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="mobileMenu">
+      <a href="#services">サービス</a>
+      <a href="#achievements">実績</a>
+      <a href="#flow">支援の流れ</a>
+      <a href="#profile">プロフィール</a>
+      <a href="#contact" class="mob-cta">お問い合わせ</a>
+    </div>
+  </nav>
+
+  <!-- ==================  Hero  ================== -->
+  <section class="hero" id="top">
+
+    <!-- Watercolor blobs — clearly visible like reference design -->
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    <div class="hero-blob hero-blob-3"></div>
+    <div class="hero-blob hero-blob-4"></div>
+
+    <!-- Floating stat badges — reference style white cards -->
+    <div class="hero-badge hb-views" aria-hidden="true">
+      <div class="hb-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
+      <div>
+        <div class="hb-num">1,413万+</div>
+        <div class="hb-lbl">累計閲覧数</div>
+      </div>
+    </div>
+
+    <div class="hero-badge hb-posts" aria-hidden="true">
+      <div class="hb-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div>
+        <div class="hb-num">670</div>
+        <div class="hb-lbl">総投稿数</div>
+      </div>
+    </div>
+
+    <div class="hero-badge hb-buzz" aria-hidden="true">
+      <div class="hb-icon hb-icon--green">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <div>
+        <div class="hb-num">19件</div>
+        <div class="hb-lbl">10万超えバズ</div>
+      </div>
+    </div>
+
+    <!-- Floating icon circles -->
+    <div class="hero-icon-float hif-1" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div class="hero-icon-float hif-2" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
+    </div>
+    <div class="hero-icon-float hif-3" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    </div>
+
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-live">
+          <span class="hero-live-dot"></span>
+          <span>Threads SNS運用サポート受付中</span>
+        </div>
+        <h1 class="hero-title">
+          Threads運用を、<br>
+          <em>仕組みで</em>変える。
+        </h1>
+        <p class="hero-desc">
+          独自開発の管理システムで、投稿分析から文案生成・予約投稿・レポート作成まで一括サポート。670本の投稿データから導いた戦略で、あなたのThreads運用を加速します。
+        </p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn-cta">まず話してみる</a>
+          <a href="#services" class="btn-ghost-link">サービスを見る <em class="arr">→</em></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-scroll" aria-hidden="true">
+      <span>SCROLL</span>
+      <div class="hero-scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ==================  Ticker  ================== -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span class="t">インサイト分析</span><span class="sep"> · </span>
+      <span class="t">投稿文案生成</span><span class="sep"> · </span>
+      <span class="t">予約投稿・自動化</span><span class="sep"> · </span>
+      <span class="t">競合・トレンド分析</span><span class="sep"> · </span>
+      <span class="t">レポート自動生成</span><span class="sep"> · </span>
+      <span class="t">返信・コメント分析</span><span class="sep"> · </span>
+      <span class="t">インサイト分析</span><span class="sep"> · </span>
+      <span class="t">投稿文案生成</span><span class="sep"> · </span>
+      <span class="t">予約投稿・自動化</span><span class="sep"> · </span>
+      <span class="t">競合・トレンド分析</span><span class="sep"> · </span>
+      <span class="t">レポート自動生成</span><span class="sep"> · </span>
+      <span class="t">返信・コメント分析</span><span class="sep"> · </span>
+    </div>
+  </div>
+
+  <!-- ==================  Metrics  ================== -->
+  <section class="metrics">
+    <div class="metrics-grid">
+      <div class="metric fade-up">
+        <span class="metric-num" data-target="1745" data-suffix="">0</span>
+        <span class="metric-lbl">フォロワー数</span>
+      </div>
+      <div class="metric fade-up delay-1">
+        <span class="metric-num" data-target="1413" data-suffix="万+">0</span>
+        <span class="metric-lbl">累計閲覧数</span>
+      </div>
+      <div class="metric fade-up delay-2">
+        <span class="metric-num" data-target="19" data-suffix="件">0</span>
+        <span class="metric-lbl">10万閲覧超えバズ</span>
+      </div>
+      <div class="metric fade-up delay-3">
+        <span class="metric-num" data-target="263" data-suffix="万">0</span>
+        <span class="metric-lbl">最大バズ閲覧数</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================  Service Cards (reference style 3-card grid)  ================== -->
+  <section class="service-cards" id="services">
+    <div class="container">
+      <div class="sc-head fade-up">
+        <p class="eyebrow"><span class="snum">01 —</span> Services</p>
+        <h2>AIシステムでできること</h2>
+        <p class="sc-head-desc">独自開発のThreads管理システムが、運用の課題をまるごと解決します。</p>
+      </div>
+      <div class="sc-grid">
+
+        <div class="sc-card fade-up">
+          <div class="sc-card-icons">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <h3>INSIGHT ANALYSIS</h3>
+          <p class="sc-sub">インサイト分析・競合調査</p>
+          <p class="sc-desc">閲覧数・エンゲージメント・競合動向を自動集計。670本の投稿データからバズの法則を可視化し、次の一手を明確にします。</p>
+        </div>
+
+        <div class="sc-card fade-up delay-1">
+          <div class="sc-card-icons">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <h3>CONTENT CREATION</h3>
+          <p class="sc-sub">文案生成・トレンド設計</p>
+          <p class="sc-desc">バズパターンを学習したAIが投稿文案を自動生成。あなたのトーンを保ちながら毎日の更新を支援し、ネタ切れを解消します。</p>
+        </div>
+
+        <div class="sc-card fade-up delay-2">
+          <div class="sc-card-icons">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41"/></svg>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h3>SYSTEMS AUTOMATION</h3>
+          <p class="sc-sub">予約投稿・自動化・レポート</p>
+          <p class="sc-desc">予約投稿から週次レポートまで全自動化。Threads運用に必要なすべてをシステムで管理し、あなたの時間を解放します。</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================  Feature Strip (reference style 4-column)  ================== -->
+  <section class="features">
+    <div class="container">
+      <div class="feat-grid">
+        <div class="feat-item fade-up">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h4>REAL-TIME<br>INSIGHTS</h4>
+        </div>
+        <div class="feat-item fade-up delay-1">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h4>DATA-DRIVEN<br>STRATEGY</h4>
+        </div>
+        <div class="feat-item fade-up delay-2">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><circle cx="12" cy="10" r="3"/><path d="M12 7v1m0 4v1m-2.6-2.6.7.7m3.8 0 .7-.7M9 10H8m8 0h-1"/></svg>
+          </div>
+          <h4>FULL<br>AUTOMATION</h4>
+        </div>
+        <div class="feat-item fade-up delay-3">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h4>EXPERT<br>GUIDANCE</h4>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================  Achievements  ================== -->
+  <section class="achievements" id="achievements">
+    <div class="container">
+      <div class="ach-head fade-up">
+        <div>
+          <p class="eyebrow eyebrow--light"><span class="snum">02 —</span> Achievements</p>
+          <h2>バズ投稿実績</h2>
+        </div>
+        <span class="ach-head-sub">10万閲覧超え · 19件</span>
+      </div>
+      <div class="ach-list">
+
+        <a href="https://www.threads.com/@kzktone/post/DWLTT0LEZE4" target="_blank" rel="noopener" class="ach-row fade-up">
+          <div>
+            <div class="ach-views" data-target="263" data-suffix="万">0</div>
+            <div class="ach-views-sub">回閲覧</div>
+          </div>
+          <div class="ach-body">
+            <p class="ach-text">「私、美人だよ」ってひと、ここに自撮りあげてほしい。独断と偏見で感想言う。</p>
+            <div class="ach-meta">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#EF4444" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              4,072 likes
+            </div>
+          </div>
+          <span class="ach-link">VIEW <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
+        </a>
+
+        <a href="https://www.threads.com/@kzktone/post/DSykFubE74A" target="_blank" rel="noopener" class="ach-row fade-up delay-1">
+          <div>
+            <div class="ach-views" data-target="140" data-suffix="万">0</div>
+            <div class="ach-views-sub">回閲覧</div>
+          </div>
+          <div class="ach-body">
+            <p class="ach-text">ごくせん、花男、イケパラ。令和男子が平成男子に勝てる訳がない。あの頃のドラマが面白かったと思いませんか？</p>
+            <div class="ach-meta">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#EF4444" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              10,704 likes
+            </div>
+          </div>
+          <span class="ach-link">VIEW <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
+        </a>
+
+        <a href="https://www.threads.com/@kzktone/post/DWhrf9SCUqK" target="_blank" rel="noopener" class="ach-row fade-up delay-2">
+          <div>
+            <div class="ach-views" data-target="94" data-suffix="万">0</div>
+            <div class="ach-views-sub">回閲覧</div>
+          </div>
+          <div class="ach-body">
+            <p class="ach-text">なんで美人の夫ってやらかす人多いんだ。</p>
+            <div class="ach-meta">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#EF4444" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              1,028 likes
+            </div>
+          </div>
+          <span class="ach-link">VIEW <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
+        </a>
+
+      </div>
+      <div class="ach-summary fade-up">
+        <div class="ach-sum">
+          <span class="ach-sum-num" data-target="92" data-suffix="">0</span>
+          <span class="ach-sum-lbl">1万閲覧超え投稿</span>
+        </div>
+        <div class="ach-sum">
+          <span class="ach-sum-num" data-target="19" data-suffix="">0</span>
+          <span class="ach-sum-lbl">10万閲覧超え投稿</span>
+        </div>
+        <div class="ach-sum">
+          <span class="ach-sum-num" data-target="1413" data-suffix="万">0</span>
+          <span class="ach-sum-lbl">累計閲覧数</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================  Flow  ================== -->
+  <section class="flow" id="flow">
+    <div class="container">
+      <div class="flow-head fade-up">
+        <p class="eyebrow"><span class="snum">03 —</span> How it works</p>
+        <h2>支援の流れ</h2>
+      </div>
+      <div class="flow-steps">
+        <div class="flow-step fade-up">
+          <span class="flow-step-num">STEP 01</span>
+          <h3>ヒアリング・現状分析</h3>
+          <p>現在の運用状況・目標・課題をヒアリング。既存のThreadsアカウントがあれば、システムでデータを取得して現状を可視化します。</p>
+        </div>
+        <div class="flow-step fade-up delay-2">
+          <span class="flow-step-num">STEP 02</span>
+          <h3>戦略設計・システム導入</h3>
+          <p>バズパターン分析をもとにコンテンツ戦略を策定。投稿テンプレート・予約設定・競合モニタリングを一括でセットアップします。</p>
+        </div>
+        <div class="flow-step fade-up delay-4">
+          <span class="flow-step-num">STEP 03</span>
+          <h3>運用サポート・改善</h3>
+          <p>週次レポートで成果を確認しながら、継続的に投稿戦略をアップデート。数字で結果を追いながら着実に成長を積み上げます。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================  Profile  ================== -->
+  <section class="profile" id="profile">
+    <div class="container">
+      <div class="profile-inner">
+        <div class="profile-left fade-up">
+          <div class="profile-avatar">島</div>
+          <span class="profile-name">島村一輝</span>
+          <span class="profile-handle">@kzktone</span>
+        </div>
+        <div class="profile-right fade-up delay-2">
+          <p class="eyebrow"><span class="snum">04 —</span> Profile</p>
+          <h2>エンジニアリングと<br>SNS運用の両方を持つ<br>サポーター</h2>
+          <p>Threads開設以来、独自の管理システムを開発しながら運用を継続。累計1,413万回閲覧・10万超えバズ投稿19件を達成。データドリブンなSNS運用を追求してきた経験をもとに、個人・法人のThreads運用を支援しています。</p>
+          <p>エンジニアとしての技術力と、実際のSNS運用で磨いたコンテンツ感覚の両方を持つのが強み。ツールを提供して終わりではなく、戦略から実行まで伴走するスタイルで支援します。</p>
+          <div class="profile-tags">
+            <span class="profile-tag">Threads運用</span>
+            <span class="profile-tag">コンテンツ戦略</span>
+            <span class="profile-tag">データ分析</span>
+            <span class="profile-tag">自動化・システム開発</span>
+            <span class="profile-tag">Node.js</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================  Contact  ================== -->
+  <section class="contact" id="contact">
+    <div class="container">
+      <div class="contact-inner fade-up">
+        <div class="contact-left">
+          <p class="eyebrow eyebrow--light"><span class="snum snum--light">05 —</span> Contact</p>
+          <h2>まずは気軽に<br>ご相談ください</h2>
+          <p>「Threadsを始めたばかり」「伸び悩んでいる」「運用を自動化したい」など、どんな段階でもお気軽にどうぞ。ご状況をヒアリングした上で、最適なサポートをご提案します。</p>
+        </div>
+        <div class="contact-list">
+          <a href="https://forms.gle/YOUR_FORM_ID" target="_blank" rel="noopener" class="contact-row">
+            <div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+            <div class="c-body">
+              <span class="c-type">Googleフォームで問い合わせ</span>
+              <span class="c-sub">返信まで1〜2営業日</span>
+            </div>
+            <span class="c-arrow">→</span>
+          </a>
+          <a href="mailto:YOUR_EMAIL@example.com" class="contact-row">
+            <div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+            <div class="c-body">
+              <span class="c-type">メールで問い合わせ</span>
+              <span class="c-sub">YOUR_EMAIL@example.com</span>
+            </div>
+            <span class="c-arrow">→</span>
+          </a>
+          <a href="https://www.threads.com/@kzktone" target="_blank" rel="noopener" class="contact-row">
+            <div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg></div>
+            <div class="c-body">
+              <span class="c-type">Threads DM</span>
+              <span class="c-sub">@kzktone にDMを送る</span>
+            </div>
+            <span class="c-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================  Footer  ================== -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-copy">© 2026 島村一輝</span>
+        <div style="display:flex;gap:24px">
+          <a href="../privacy-policy.html" class="footer-link">プライバシーポリシー</a>
+          <a href="../terms-of-service.html" class="footer-link">利用規約</a>
+          <a href="https://www.threads.com/@kzktone" target="_blank" rel="noopener" class="footer-link">@kzktone</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
