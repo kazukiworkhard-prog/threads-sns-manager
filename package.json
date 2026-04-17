@@ -5,7 +5,7 @@
   "type": "module",
   "main": "threads.js",
   "scripts": {
-    "start": "node threads.js",
+    "start": "node threads.js dashboard",
     "dashboard": "node threads.js dashboard",
     "analyze": "node threads.js analyze",
     "plan": "node threads.js plan",

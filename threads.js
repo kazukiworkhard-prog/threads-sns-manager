@@ -309,7 +309,7 @@ async function runDashboard(commander) {
 
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const app = express();
-  const PORT = parseInt(process.env.DASHBOARD_PORT || '3000');
+  const PORT = parseInt(process.env.PORT || process.env.DASHBOARD_PORT || '3000');
 
   // ユーザーストア初期化
   const userStore = new UserStore();
